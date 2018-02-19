@@ -2,9 +2,14 @@
 
 require_once("parseChinese.php");
 
-$text = file_get_contents("*.xhtml");
+$options = getopt("f:o:");
+$input_file = $options["i"];
+$output_file = $options["o"];
+
+$text = file_get_contents($input_file);
 
 $parsed = parseChinese($text, "mandarin_words.txt");
+$parsed = array_unique($parsed);
 $count = count($parsed);
 
 $rez = "";
@@ -12,7 +17,9 @@ $rez = "";
 for ($j=0; $j < $count; $j++) {    
 
 	$word = $parsed[$j];
+
 	$rez .= $word . "\r\n";
+
 	$urlencoded_word = urlencode($word);
 	
 	$pinyin_url = "https://glosbe.com/transliteration/api?from=Han&dest=Latin&text=".$urlencoded_word."&format=json";
@@ -40,9 +47,16 @@ for ($j=0; $j < $count; $j++) {
 
 }
 
-//Записть результата в файл (промежуточный рез.)
-$file = "result.txt";
-fopen($file, "w");
-file_put_contents($file, $rez);
+//Промежуточный результат
+fopen("result.txt", "w");
+file_put_contents("result.txt", $rez);
+
+//Получить иксхтмл
+//и сделать замену
+//str_replace($chto, $chem, $gde);
+
+
+fopen($output_file, "w");
+file_put_contents($output_file, $rez);
 
 ?>
